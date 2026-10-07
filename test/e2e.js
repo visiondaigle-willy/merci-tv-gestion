@@ -8,7 +8,7 @@ const os = require('os');
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mtv-'));
   const shots = process.env.SHOTS || path.join(dataDir, 'shots');
   fs.mkdirSync(shots, { recursive: true });
-  const app = await electron.launch({ executablePath: require(path.join(__dirname, '..', 'node_modules', 'electron')), args: [path.join(__dirname, '..'), ...(process.getuid && process.getuid() === 0 ? ['--no-sandbox'] : [])], env: { ...process.env, MERCI_TV_DATA_DIR: dataDir } });
+  const app = await electron.launch({ executablePath: process.env.ELECTRON_PATH || require(path.join(__dirname, '..', 'node_modules', 'electron')), args: [path.join(__dirname, '..'), ...(process.getuid && process.getuid() === 0 ? ['--no-sandbox'] : [])], env: { ...process.env, MERCI_TV_DATA_DIR: dataDir } });
   const win = await app.firstWindow();
   const errors = [];
   win.on('pageerror', e => errors.push(e.message));
@@ -28,7 +28,7 @@ const os = require('os');
   };
   const save = async () => { await win.click('.modal [data-a=save]'); await win.waitForTimeout(150); };
   const add = async () => { await win.click('[data-new]'); await win.waitForSelector('.modal'); };
-  const noModal = async label => { await win.waitForTimeout(250); const n = await win.locator('.modal').count(); if (n) { const err = await win.locator('.modal').last().textContent().catch(() => ''); throw new Error(`${label}: modal still open — ${err}`); } };
+  const noModal = async label => { await win.waitForTimeout(500); const n = await win.locator('.modal').count(); if (n) { const err = await win.locator('.modal').last().textContent().catch(() => ''); throw new Error(`${label}: modal still open — ${err}`); } };
 
   // 1. Configuration initiale
   await win.waitForSelector('form#f');

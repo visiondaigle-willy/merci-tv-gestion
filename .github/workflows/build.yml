@@ -45,8 +45,42 @@ jobs:
             dist/*.zip
           if-no-files-found: error
 
+  # iMac / MacBook Intel sous macOS 12 Monterey : Electron 44 et plus exige macOS 13,
+  # on construit donc une version avec Electron 43 (dernière compatible Monterey).
+  build-mac-monterey:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: Construire (Intel, macOS 12)
+        run: >
+          npx electron-builder --mac dmg zip --x64 --publish never
+          -c.electronVersion=43.7.8
+          -c.mac.artifactName='MERCI-TV-Gestion-${version}-mac-intel-macOS12.${ext}'
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+      - name: Vérifier la version minimale de macOS
+        run: |
+          plist="dist/mac/MERCI TV Gestion.app/Contents/Info.plist"
+          min=$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$plist")
+          echo "LSMinimumSystemVersion = $min"
+          case "$min" in 12.*|11.*|10.*) echo "Compatible macOS 12 Monterey";; *) echo "::error::Version minimale $min incompatible avec Monterey"; exit 1;; esac
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "dist/mac/MERCI TV Gestion.app/Contents/Frameworks/Electron Framework.framework/Resources/Info.plist" || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MERCI-TV-Gestion-macOS12
+          path: |
+            dist/*.dmg
+            dist/*.zip
+          if-no-files-found: error
+
   release:
-    needs: build
+    needs: [build, build-mac-monterey]
     if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.release)
     runs-on: ubuntu-latest
     steps:
@@ -70,9 +104,11 @@ jobs:
             - `MERCI-TV-Gestion-Portable-${{ steps.v.outputs.version }}.exe` — version sans installation (clé USB)
             - Si Windows affiche « Windows a protégé votre ordinateur » : *Informations complémentaires → Exécuter quand même*.
 
-            **macOS 11 et plus**
-            - Mac Apple Silicon (M1, M2, M3, M4) : `MERCI-TV-Gestion-${{ steps.v.outputs.version }}-mac-arm64.dmg`
-            - Mac Intel : `MERCI-TV-Gestion-${{ steps.v.outputs.version }}-mac-x64.dmg`
+            **macOS 12 et plus**
+            - Mac Apple Silicon (M1, M2, M3, M4) sous macOS 13 ou plus récent : `MERCI-TV-Gestion-${{ steps.v.outputs.version }}-mac-arm64.dmg`
+            - Mac Intel sous macOS 13 Ventura ou plus récent : `MERCI-TV-Gestion-${{ steps.v.outputs.version }}-mac-x64.dmg`
+            - **Mac Intel sous macOS 12 Monterey** (ex. iMac 2015–2017) : `MERCI-TV-Gestion-${{ steps.v.outputs.version }}-mac-intel-macOS12.dmg`
+            - Pour connaître votre version : menu Pomme → *À propos de ce Mac*.
             - Glissez l’application dans *Applications*, puis au premier lancement : *clic droit → Ouvrir → Ouvrir*.
             - Si macOS indique que l’application est « endommagée » : `xattr -cr "/Applications/MERCI TV Gestion.app"` dans le Terminal.
 

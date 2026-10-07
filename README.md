@@ -54,17 +54,19 @@ Téléchargez les installateurs sur la page **Releases** du dépôt : https://gi
 
 ### Windows (10 / 11, 64 bits)
 
-1. Lancez `MERCI-TV-Gestion-Setup-1.1.0.exe`.
+1. Lancez `MERCI-TV-Gestion-Setup-1.1.1.exe`.
 2. Si Windows affiche « Windows a protégé votre ordinateur », cliquez sur **Informations complémentaires → Exécuter quand même** (le logiciel n’est pas encore signé avec un certificat commercial).
 3. Suivez l’assistant. Un raccourci est créé sur le bureau et dans le menu Démarrer.
 
-Version sans installation : `MERCI-TV-Gestion-Portable-1.1.0.exe` (pratique sur clé USB).
+Version sans installation : `MERCI-TV-Gestion-Portable-1.1.1.exe` (pratique sur clé USB).
 
-### macOS (11 et plus)
+### macOS (12 Monterey et plus)
 
 1. Ouvrez le fichier `.dmg` qui correspond à votre Mac :
    - `…-mac-arm64.dmg` pour un Mac Apple Silicon (M1, M2, M3, M4) ;
-   - `…-mac-x64.dmg` pour un Mac Intel.
+   - `…-mac-x64.dmg` pour un Mac Intel sous macOS 13 Ventura ou plus récent ;
+   - `…-mac-intel-macOS12.dmg` pour un Mac Intel sous **macOS 12 Monterey** (par exemple un iMac 2015 à 2017).
+   Pour connaître votre version : menu Pomme → *À propos de ce Mac*. Si l’icône de l’application apparaît barrée, c’est que le fichier ne correspond pas à votre version de macOS.
 2. Glissez **MERCI TV Gestion** dans le dossier **Applications**.
 3. Au premier lancement : **clic droit sur l’application → Ouvrir → Ouvrir** (l’application n’est pas notariée par Apple).
    Si macOS indique que l’application est « endommagée », ouvrez le Terminal et tapez :
