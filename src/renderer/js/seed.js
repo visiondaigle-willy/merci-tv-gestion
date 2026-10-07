@@ -4,10 +4,10 @@ const SEED = (() => {
   const ROLES = {
     admin: { label: 'Administrateur', modules: '*' },
     pasteur: { label: 'Responsable principal / Conseil', modules: '*' },
-    secretariat: { label: 'Secrétariat', modules: ['dashboard', 'gouvernance', 'membres', 'predication', 'ministeres', 'archives', 'calendrier', 'guide'] },
-    tresorerie: { label: 'Trésorerie', modules: ['dashboard', 'dons', 'budget', 'depenses', 'rapports', 'archives', 'calendrier', 'guide'] },
-    media: { label: 'Département média MERCI TV', modules: ['dashboard', 'predication', 'mercitv', 'archives', 'calendrier', 'guide'] },
-    responsable: { label: 'Responsable de ministère', modules: ['dashboard', 'ministeres', 'depenses', 'guide'] }
+    secretariat: { label: 'Secrétariat', modules: ['dashboard', 'gouvernance', 'membres', 'predication', 'ministeres', 'archives', 'calendrier', 'guide', 'bible'] },
+    tresorerie: { label: 'Trésorerie', modules: ['dashboard', 'dons', 'budget', 'depenses', 'rapports', 'archives', 'calendrier', 'guide', 'bible'] },
+    media: { label: 'Département média MERCI TV', modules: ['dashboard', 'predication', 'mercitv', 'archives', 'calendrier', 'guide', 'bible'] },
+    responsable: { label: 'Responsable de ministère', modules: ['dashboard', 'ministeres', 'depenses', 'guide', 'bible'] }
   };
 
   const INSTANCES = [
@@ -134,6 +134,7 @@ const SEED = (() => {
       archives: [],
       indicators: {},
       calendarChecks: {},
+      bibleBookmarks: [],
       log: []
     };
   }

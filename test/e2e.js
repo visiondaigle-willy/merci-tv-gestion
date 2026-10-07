@@ -146,7 +146,45 @@ const os = require('os');
   await win.click('#un'); await win.fill('#u1', 'Sœur Trésorière'); await win.fill('#u2', 'tresor'); await win.selectOption('#u3', 'tresorerie'); await win.fill('#u4', 'tresor1234'); await win.click('.modal [data-a=ok]'); await win.waitForTimeout(200);
   await win.click('#un'); await win.fill('#u1', 'Pasteur Conseil'); await win.fill('#u2', 'pasteur'); await win.selectOption('#u3', 'pasteur'); await win.fill('#u4', 'pasteur1234'); await win.click('.modal [data-a=ok]'); await win.waitForTimeout(200);
   await shot('13-utilisateurs');
-  await nav('dashboard'); await shot('14-dashboard');
+  await nav('dashboard'); await win.waitForSelector('#vday .vtext'); await shot('14-dashboard');
+
+  // Bible Louis Segond 1910
+  await nav('bible');
+  await win.waitForSelector('.bible-page');
+  await win.fill('#refin', 'Jean 3:16'); await win.click('#goref button'); await win.waitForSelector('.vs.sel');
+  const vtxt = await win.locator('.vs.sel').first().textContent();
+  if (!/tant aimé le monde/.test(vtxt)) throw new Error('Jean 3:16 introuvable: ' + vtxt);
+  await win.locator('.vs[data-v="17"]').click({ modifiers: ['Shift'] });
+  if (!/Jean 3:16-17/.test(await win.locator('#selbar').textContent())) throw new Error('sélection de plage');
+  await shot('17-bible-lecture');
+  // projection
+  const [proj] = await Promise.all([app.waitForEvent('window'), win.click('#selbar [data-s=proj]')]);
+  await proj.waitForFunction(() => /tant aimé/.test(document.querySelector('.text').textContent));
+  await win.waitForSelector('.proj-bar');
+  await win.click('.proj-bar [data-p=next]');
+  await proj.waitForFunction(() => /Jean 3:18/i.test(document.querySelector('.ref').textContent));
+  await proj.setViewportSize({ width: 1280, height: 720 }).catch(() => {});
+  await proj.screenshot({ path: path.join(shots, '18-projection.png') });
+  await shot('18-bible-pilotage');
+  await win.click('.proj-bar [data-p=stop]'); await win.waitForTimeout(300);
+  // marque-page
+  await win.click('#selbar [data-s=clear]');
+  await win.locator('.vs[data-v="16"]').click();
+  await win.click('#selbar [data-s=mark]'); await win.fill('#pv', 'Verset de la campagne'); await win.click('.modal [data-a=ok]'); await win.waitForTimeout(200);
+  // recherche
+  await tab('Recherche'); await win.fill('#sq', 'eternel est mon berger'); await win.click('#sf button'); await win.waitForSelector('.res');
+  if (!/Psaumes 23:1/.test(await win.locator('#sr').textContent())) throw new Error('recherche');
+  await shot('19-bible-recherche');
+  await win.locator('.res').first().click(); await win.waitForSelector('.vs.sel');
+  await tab('Marque-pages'); await shot('20-bible-marque-pages');
+  // champ « texte biblique » d'un culte
+  await nav('predication'); await tab('Programme des cultes');
+  await add(); await fill('scripture', '1 Co 14:40'); await win.click('.modal [data-bible=scripture]');
+  await win.waitForFunction(() => /bienséance/.test(document.querySelector('.overlay:last-child .modal').textContent));
+  await shot('21-culte-texte-biblique');
+  await win.locator('.overlay:last-child .x').click(); await win.locator('.overlay .x').click();
+
+
 
   const login = async (l, pw) => { await win.click('#btn-out'); await win.waitForSelector('form#f'); await win.fill('[name=login]', l); await win.fill('[name=pw]', pw); await win.click('button.gold'); await win.waitForSelector('.shell'); };
   // 11. Compte trésorerie : modules restreints + signature trésorier
@@ -171,6 +209,7 @@ const os = require('os');
   const exp = data.expenses[0];
   if (!exp.ok_resp || !exp.ok_tres || exp.ok_past || exp.ok_resp.userId === exp.ok_tres.userId) throw new Error('signatures incorrectes');
   if (data.members.length !== 2 || data.members[0].number !== 'M-0001') throw new Error('membres');
+  if (data.bibleBookmarks.length !== 1 || data.bibleBookmarks[0].ref !== 'Jean 3:16') throw new Error('marque-page');
   if (!fs.readdirSync(path.join(dataDir, 'sauvegardes')).length) throw new Error('aucune sauvegarde automatique');
   await app.close();
   if (errors.length) { console.error('Erreurs console :\n' + errors.join('\n')); process.exit(1); }

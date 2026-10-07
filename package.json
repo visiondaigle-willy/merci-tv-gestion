@@ -1,7 +1,7 @@
 {
   "name": "merci-tv-gestion",
   "productName": "MERCI TV Gestion",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Logiciel de gestion d'Église et du ministère média MERCI TV",
   "main": "src/main/main.js",
   "author": {
@@ -11,7 +11,7 @@
   "private": true,
   "scripts": {
     "start": "electron .",
-    "test": "node test/store.test.js",
+    "test": "node test/store.test.js && node test/bible.test.js",
     "dist": "electron-builder --publish never",
     "dist:win": "electron-builder --win --publish never",
     "dist:mac": "electron-builder --mac --publish never",

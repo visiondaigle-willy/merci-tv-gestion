@@ -22,9 +22,19 @@ Le logiciel fonctionne **sans Internet**. Toutes les données restent sur l’or
 | 09 | **Archives** | Registre des documents selon le plan de classement du guide, copie numérique jointe, niveau de confidentialité |
 | 09 | **Rapports** | Tableau de bord mensuel (12 indicateurs du guide, calculés automatiquement, cumul annuel), rapport financier mensuel, journal de toutes les opérations (audit) |
 | 10 | **Calendrier de gestion** | Actions hebdomadaires, mensuelles, trimestrielles, semestrielles et annuelles à cocher (horodatées, nom de la personne) |
+| ✝ | **Bible Louis Segond 1910** | Texte intégral hors ligne (66 livres, 31 102 versets). Lecture par livre et chapitre, accès direct par référence (« Jean 3:16 », « 1 Co 13:4-7 », « Ps 23 »), recherche sans tenir compte des accents, marque-pages, copie et impression. **Projection** sur un second écran ou un vidéoprojecteur pour le culte et la régie MERCI TV : verset suivant/précédent au clavier, écran noir, fond vert pour l’incrustation. Verset du jour sur le tableau de bord ; bouton « 📖 Lire » dans les champs « Texte biblique » des cultes et des émissions |
 | — | **Paramètres** | Informations de l’Église, validation du manuel, utilisateurs et rôles, sauvegardes |
 
 Toutes les listes s’exportent en **CSV (Excel)** et en **PDF** ; bordereaux, demandes de dépense, fiches prédicateurs, fiches membres, PV et rapports s’impriment au format du guide.
+
+### Projection des versets (culte et MERCI TV)
+
+1. Branchez le vidéoprojecteur ou le second écran : la fenêtre de projection s’y ouvre automatiquement en plein écran.
+2. Dans **Bible**, cliquez sur un ou plusieurs versets (Maj + clic pour une plage), puis **Projeter**. Un double-clic projette directement un verset.
+3. Pilotez depuis la barre du bas, ou au clavier : **→ / Espace** verset suivant, **←** verset précédent, **B** écran noir.
+4. **Fond vert** : affiche le texte sur fond vert pour l’incruster dans l’image en direct (OBS, vMix, régie vidéo).
+
+Le texte Louis Segond 1910 est dans le domaine public.
 
 ### Sécurité et confidentialité
 
@@ -42,11 +52,11 @@ Toutes les listes s’exportent en **CSV (Excel)** et en **PDF** ; bordereaux, d
 
 ### Windows (10 / 11, 64 bits)
 
-1. Lancez `MERCI-TV-Gestion-Setup-1.0.0.exe`.
+1. Lancez `MERCI-TV-Gestion-Setup-1.1.0.exe`.
 2. Si Windows affiche « Windows a protégé votre ordinateur », cliquez sur **Informations complémentaires → Exécuter quand même** (le logiciel n’est pas encore signé avec un certificat commercial).
 3. Suivez l’assistant. Un raccourci est créé sur le bureau et dans le menu Démarrer.
 
-Version sans installation : `MERCI-TV-Gestion-Portable-1.0.0.exe` (pratique sur clé USB).
+Version sans installation : `MERCI-TV-Gestion-Portable-1.1.0.exe` (pratique sur clé USB).
 
 ### macOS (11 et plus)
 

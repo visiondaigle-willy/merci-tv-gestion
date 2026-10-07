@@ -15,5 +15,12 @@ contextBridge.exposeInMainWorld('api', {
   exportPDF: (html, name) => ipcRenderer.invoke('pdf:export', html, name),
   printHTML: html => ipcRenderer.invoke('print:html', html),
   attachFile: () => ipcRenderer.invoke('file:attach'),
-  openFile: stored => ipcRenderer.invoke('file:open', stored)
+  openFile: stored => ipcRenderer.invoke('file:open', stored),
+  copyText: txt => ipcRenderer.invoke('clipboard:write', txt),
+  projectorOpen: () => ipcRenderer.invoke('projector:open'),
+  projectorShow: payload => ipcRenderer.invoke('projector:show', payload),
+  projectorClose: () => ipcRenderer.invoke('projector:close'),
+  projectorFullscreen: () => ipcRenderer.invoke('projector:fullscreen'),
+  onProjectorData: cb => ipcRenderer.on('projector:data', (_e, d) => cb(d)),
+  onProjectorClosed: cb => ipcRenderer.on('projector:closed', () => cb())
 });

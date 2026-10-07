@@ -1,5 +1,5 @@
 'use strict';
-const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu, screen, clipboard } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -7,6 +7,7 @@ const { Store } = require('./store');
 const { hashPassword, verifyPassword } = require('./auth');
 
 let win;
+let projector = null;
 let store;
 const isMac = process.platform === 'darwin';
 
@@ -87,7 +88,36 @@ async function renderHidden(html) {
   return { w, cleanup: () => { try { fs.unlinkSync(tmp); } catch (_) {} if (!w.isDestroyed()) w.close(); } };
 }
 
+// Fenêtre de projection des versets (écran secondaire / vidéoprojecteur / régie MERCI TV)
+function openProjector() {
+  if (projector && !projector.isDestroyed()) { projector.show(); return; }
+  const displays = screen.getAllDisplays();
+  const primary = screen.getPrimaryDisplay();
+  const external = displays.find(d => d.id !== primary.id);
+  const target = (external || primary).bounds;
+  projector = new BrowserWindow({
+    x: target.x + (external ? 0 : 60), y: target.y + (external ? 0 : 60),
+    width: external ? target.width : 960, height: external ? target.height : 540,
+    fullscreen: !!external, backgroundColor: '#0f1a33', title: 'MERCI TV — Projection',
+    autoHideMenuBar: true,
+    webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, sandbox: true }
+  });
+  projector.loadFile(path.join(__dirname, '..', 'renderer', 'projector.html'));
+  projector.on('closed', () => { projector = null; if (win && !win.isDestroyed()) win.webContents.send('projector:closed'); });
+}
+
 function registerIpc() {
+  ipcMain.handle('clipboard:write', (_e, txt) => { clipboard.writeText(String(txt)); return true; });
+  ipcMain.handle('projector:open', () => { openProjector(); return true; });
+  ipcMain.handle('projector:show', (_e, payload) => {
+    if (!projector || projector.isDestroyed()) openProjector();
+    const send = () => projector.webContents.send('projector:data', payload);
+    if (projector.webContents.isLoading()) projector.webContents.once('did-finish-load', send); else send();
+    return true;
+  });
+  ipcMain.handle('projector:close', () => { if (projector && !projector.isDestroyed()) projector.close(); return true; });
+  ipcMain.handle('projector:fullscreen', () => { if (projector && !projector.isDestroyed()) projector.setFullScreen(!projector.isFullScreen()); return true; });
+
   ipcMain.handle('data:load', () => store.load());
   ipcMain.handle('data:save', (_e, data) => store.save(data));
 

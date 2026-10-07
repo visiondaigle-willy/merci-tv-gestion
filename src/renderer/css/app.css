@@ -257,3 +257,35 @@ table.grid td.act .btn { margin: 2px 0 2px 4px; }
 table.grid input.cell.text[data-k=name] { min-width: 240px; font-weight: 600; }
 .kpi .v { font-size: 22px; white-space: nowrap; }
 .toolbar input[type=search] { min-width: 200px; flex: 1; max-width: 320px; }
+
+/* ---------- Bible ---------- */
+.bible-page { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px 40px 30px; font-family: var(--serif); max-width: 900px; margin-bottom: 70px; }
+.bible-title { font-size: 1.7em; margin-bottom: 14px; }
+.bible-title span { color: var(--gold); }
+.vs { margin: 0 0 4px; padding: 3px 8px; line-height: 1.75; border-radius: 4px; cursor: pointer; color: #1f2840; }
+.vs:hover { background: var(--row); }
+.vs sup { font-family: var(--sans); font-size: .62em; font-weight: 700; color: #b18a35; margin-right: 5px; }
+.vs.sel { background: var(--cream); box-shadow: inset 3px 0 0 var(--gold); }
+.vs.projected { background: #e7eefa; box-shadow: inset 3px 0 0 var(--info); }
+.modal .vs { cursor: default; }
+.bible-hint { font-family: var(--sans); font-size: 12px; margin-top: 18px; }
+.sel-bar { position: sticky; bottom: 12px; display: none; align-items: center; gap: 8px; flex-wrap: wrap; max-width: 900px; background: var(--navy); color: #fff; padding: 10px 14px; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.2); margin-top: -56px; }
+.sel-bar.show { display: flex; }
+.sel-bar .muted { color: #aab3c7; margin-right: auto; }
+.sel-bar .btn:not(.gold) { background: transparent; color: #fff; border-color: rgba(255,255,255,.25); }
+.proj-bar { position: fixed; left: 252px; right: 0; bottom: 0; z-index: 40; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 24px; background: #0b1428; color: #fff; border-top: 2px solid var(--gold); }
+.proj-bar .live { color: #ff7b6b; font-size: 11px; font-weight: 700; letter-spacing: .12em; }
+.proj-bar b { margin-right: auto; font-family: var(--serif); font-size: 15px; }
+.proj-bar .btn:not(.gold):not(.primary) { background: transparent; color: #fff; border-color: rgba(255,255,255,.25); }
+.proj-bar .btn.danger { color: #ffb4a3; }
+.results { display: flex; flex-direction: column; gap: 6px; }
+.res { display: grid; grid-template-columns: 170px 1fr auto; gap: 14px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; cursor: pointer; }
+.res:hover { border-color: var(--gold); }
+.res b { color: var(--navy); font-family: var(--serif); }
+.res span { line-height: 1.55; font-family: var(--serif); }
+.res em { display: block; margin-top: 4px; font-family: var(--sans); color: #8a6b22; }
+.res small { display: block; margin-top: 4px; font-family: var(--sans); }
+.res mark { background: #f6e3a8; padding: 0 1px; border-radius: 2px; }
+.verse-day .eyebrow { font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 8px; }
+.verse-day .vtext { font-family: var(--serif); font-style: italic; font-size: 16px; line-height: 1.6; margin: 0 0 12px; color: var(--navy); }
+.verse-day .vref { font-family: var(--serif); color: #8a6b22; }

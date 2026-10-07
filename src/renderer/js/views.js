@@ -39,6 +39,8 @@ const IND = (() => {
 })();
 
 const VIEWS = {
+  bible: el => BIBLE_UI.view(el),
+
   /* ================= Tableau de bord ================= */
   dashboard(el) {
     const D = App.data, today = U.today(), month = today.slice(0, 7);
@@ -86,8 +88,22 @@ const VIEWS = {
         <div class="card"><h3>Prochains cultes</h3>${nextServices.length ? `<ul class="list">${nextServices.map(x => `<li><span class="d">${U.date(x.date)} ${U.esc(x.time || '')}</span><span class="t"><b>${U.esc(x.type)}</b> — ${U.esc(D.preachers.find(p => p.id === x.preacherId)?.name || 'prédicateur à définir')}${x.theme ? ` · <span class="muted">${U.esc(x.theme)}</span>` : ''}</span>${x.live ? '<span class="pill info">Direct</span>' : ''}</li>`).join('')}</ul>` : '<p class="muted">Aucun culte programmé. Ajoutez-les dans « Prédicateurs et cultes ».</p>'}</div>
         <div class="card"><h3>Prochaines émissions MERCI TV</h3>${nextEps.length ? `<ul class="list">${nextEps.map(x => `<li><span class="d">${U.date(x.date)}</span><span class="t"><b>${U.esc(x.title)}</b> <span class="muted">${U.esc(D.tvPrograms.find(p => p.id === x.programId)?.name || '')}</span></span><span class="pill">${U.esc(x.status)}</span></li>`).join('')}</ul>` : '<p class="muted">Aucune émission planifiée.</p>'}</div>
       </div>
-      <div class="banner mt"><div class="eyebrow">Déclaration d’identité</div><p>${U.esc(s.identity)}</p></div>
+      <div class="cols mt">
+        <div class="card verse-day" id="vday"><div class="eyebrow">Verset du jour · Louis Segond 1910</div><p class="muted">Chargement…</p></div>
+        <div class="banner" style="margin:0"><div class="eyebrow">Déclaration d’identité</div><p>${U.esc(s.identity)}</p></div>
+      </div>
     </div>`;
+    const ref = BIBLE.daily();
+    const later = BIBLE.ready() ? Promise.resolve() : new Promise(r => setTimeout(r, 700)); // laisse l'interface s'afficher d'abord
+    later.then(() => BIBLE.load()).then(() => {
+      const box = el.querySelector('#vday');
+      if (!box) return;
+      const verses = BIBLE.passage(BIBLE.parse(ref));
+      box.innerHTML = `<div class="eyebrow">Verset du jour · Louis Segond 1910</div><p class="vtext">« ${U.esc(verses.map(v => v.t).join(' '))} »</p>
+        <div class="row-flex"><b class="vref">${U.esc(ref)}</b><span style="flex:1"></span><button class="btn sm" data-vd="read">Lire le contexte</button><button class="btn sm gold" data-vd="proj">Projeter</button></div>`;
+      box.querySelector('[data-vd=read]').onclick = () => BIBLE_UI.openRef(ref);
+      box.querySelector('[data-vd=proj]').onclick = () => BIBLE_UI.preview(ref);
+    }).catch(() => {});
     el.querySelectorAll('[data-go2]').forEach(n => (n.onclick = () => App.go(n.dataset.go2)));
   },
 
@@ -461,7 +477,7 @@ const VIEWS = {
       <p>Toute décision doit respecter les statuts, les lois applicables, les principes bibliques et les décisions régulièrement adoptées par les instances habilitées. Les données personnelles, les informations financières individuelles, les dossiers pastoraux et les contenus sensibles sont strictement confidentiels.</p>
       <h2 class="sec">Où retrouver chaque chapitre dans le logiciel</h2>
       <div class="table-wrap"><table class="grid"><tbody>
-        ${[['02', 'Organisation et gouvernance', 'Instances, réunions, procès-verbaux, décisions et échéances', 'gouvernance'], ['03', 'Gestion des membres', 'Registre, suivi, parcours d’intégration en 6 étapes', 'membres'], ['04', 'Dîmes, offrandes et dons', 'Bordereaux de collecte, double comptage, dépôt, rapprochement', 'dons'], ['05', 'Budget, dépenses et contrôle', 'Budget annuel, demandes de dépense et triple autorisation', 'budget'], ['06', 'Prédicateurs et programme des cultes', 'Fiches prédicateurs, charte, planning des cultes', 'predication'], ['07', 'Ministères et bénévoles', 'Ministères, plans d’action trimestriels, rapports', 'ministeres'], ['08', 'MERCI TV', 'Programmes, grille, émissions, contrôle de conformité', 'mercitv'], ['09', 'Archives, rapports et audit', 'Registre des archives, rapport financier, tableau de bord, journal', 'rapports'], ['10', 'Calendrier annuel de gestion', 'Actions hebdomadaires à annuelles, validation du manuel', 'calendrier']]
+        ${[['02', 'Organisation et gouvernance', 'Instances, réunions, procès-verbaux, décisions et échéances', 'gouvernance'], ['03', 'Gestion des membres', 'Registre, suivi, parcours d’intégration en 6 étapes', 'membres'], ['04', 'Dîmes, offrandes et dons', 'Bordereaux de collecte, double comptage, dépôt, rapprochement', 'dons'], ['05', 'Budget, dépenses et contrôle', 'Budget annuel, demandes de dépense et triple autorisation', 'budget'], ['06', 'Prédicateurs et programme des cultes', 'Fiches prédicateurs, charte, planning des cultes', 'predication'], ['07', 'Ministères et bénévoles', 'Ministères, plans d’action trimestriels, rapports', 'ministeres'], ['08', 'MERCI TV', 'Programmes, grille, émissions, contrôle de conformité', 'mercitv'], ['09', 'Archives, rapports et audit', 'Registre des archives, rapport financier, tableau de bord, journal', 'rapports'], ['10', 'Calendrier annuel de gestion', 'Actions hebdomadaires à annuelles, validation du manuel', 'calendrier'], ['✝', 'Bible Louis Segond 1910', 'Lecture, recherche, marque-pages et projection des versets pendant le culte et sur MERCI TV', 'bible']]
           .map(([n, t, d, go]) => `<tr class="${App.canModule(go) ? 'clickable' : ''}" data-go3="${go}"><td style="width:50px;font-family:var(--serif);color:var(--gold);font-size:18px">${n}</td><td class="strong">${t}</td><td>${d}</td></tr>`).join('')}
       </tbody></table></div>
       <p class="muted mt">Document interne et confidentiel. À adapter aux statuts de l’Église, à la réglementation ivoirienne applicable et aux orientations de son autorité spirituelle.</p>

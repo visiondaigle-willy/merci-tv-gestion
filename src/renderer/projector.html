@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'">
+  <title>MERCI TV — Projection</title>
+  <style>
+    @font-face { font-family: 'Lora'; font-weight: 400; src: url('fonts/lora-latin-400-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Lora'; font-weight: 600; src: url('fonts/lora-latin-600-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-weight: 600; src: url('fonts/inter-latin-600-normal.woff2') format('woff2'); }
+    html, body { margin: 0; height: 100%; cursor: none; }
+    body { background: radial-gradient(ellipse at 50% 35%, #1f3266 0%, #0f1a33 72%); color: #fff; font-family: 'Lora', Georgia, serif; display: flex; align-items: center; justify-content: center; overflow: hidden; transition: background .3s; }
+    body.black { background: #000; }
+    body.black main { opacity: 0; }
+    body.green { background: #00b140; } /* incrustation (chroma key) pour la régie MERCI TV */
+    body.green .frame, body.green .brand { display: none; }
+    main { width: 86vw; text-align: center; transition: opacity .35s; }
+    .text { font-size: var(--size, 5.2vh); line-height: 1.45; text-wrap: balance; }
+    .text sup { font-family: 'Inter', sans-serif; font-size: .45em; color: #e6d4a6; margin-right: .25em; vertical-align: .9em; }
+    .ref { margin-top: 4vh; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: .25em; text-transform: uppercase; color: #c9a24a; font-size: 2.6vh; }
+    .ref::before, .ref::after { content: ''; display: inline-block; width: 6vh; height: 1px; background: #c9a24a; vertical-align: middle; margin: 0 2vh; opacity: .7; }
+    .frame { position: fixed; inset: 3vh; border: 1px solid rgba(201,162,74,.35); pointer-events: none; }
+    .brand { position: fixed; bottom: 4.5vh; right: 5vh; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: .3em; font-size: 1.5vh; color: rgba(255,255,255,.45); }
+    .idle { color: rgba(255,255,255,.5); font-style: italic; font-size: 3vh; }
+  </style>
+</head>
+<body>
+  <div class="frame"></div>
+  <main><div class="text idle">MERCI TV — en attente d’un passage biblique…</div><div class="ref"></div></main>
+  <div class="brand">MERCI TV · LOUIS SEGOND 1910</div>
+  <script src="js/projector.js"></script>
+</body>
+</html>

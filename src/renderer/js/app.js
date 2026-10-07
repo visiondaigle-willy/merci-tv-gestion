@@ -28,6 +28,7 @@ const NAV = [
     { id: 'archives', label: 'Archives', num: '09' }
   ] },
   { group: 'Référence', items: [
+    { id: 'bible', label: 'Bible Louis Segond 1910', num: '✝' },
     { id: 'guide', label: 'Guide de gestion', num: '01' },
     { id: 'parametres', label: 'Paramètres', roles: ['admin', 'pasteur'] }
   ] }
@@ -496,6 +497,7 @@ const App = {
         case 'checks': input = `<div class="checks ${f.col ? 'col' : ''}">${f.options.map(o => `<label><input type="checkbox" data-checks="${f.k}" value="${U.esc(o)}" ${(v || []).includes(o) ? 'checked' : ''} ${dis}> ${U.esc(o)}</label>`).join('')}</div>`; break;
         case 'computed': input = `<div class="computed" data-computed="${f.k}">${U.esc(f.compute(r))}</div>`; break;
         case 'file': input = `<div class="attach" data-file="${f.k}">${fileInner(f)}</div>`; break;
+        case 'scripture': input = `<div class="attach"><input id="fld-${f.k}" name="${f.k}" type="text" value="${U.esc(v ?? '')}" placeholder="ex. Jean 3:16-18" ${dis}><button type="button" class="btn sm" data-bible="${f.k}" title="Lire le passage (Louis Segond 1910)">📖 Lire</button></div>`; break;
         case 'money': case 'number': input = `<input id="fld-${f.k}" name="${f.k}" type="number" step="${f.type === 'money' ? '1' : 'any'}" min="0" value="${U.esc(v ?? '')}" ${dis}>`; break;
         default: input = `<input id="fld-${f.k}" name="${f.k}" type="${f.type || 'text'}" value="${U.esc(v ?? '')}" ${dis}>`;
       }
@@ -534,6 +536,7 @@ const App = {
       box.querySelector('[data-detach]')?.addEventListener('click', () => { r[k] = null; repaint(); });
     };
     m.el.querySelectorAll('[data-file]').forEach(bindFile);
+    m.el.querySelectorAll('[data-bible]').forEach(b => (b.onclick = () => BIBLE_UI.preview(m.el.querySelector(`[name="${b.dataset.bible}"]`).value)));
 
     $('[data-a=cancel]').onclick = m.close;
     $('[data-a=print]')?.addEventListener('click', () => { read(); this.printMenu(S.print(r), `${S.title}-${this.label(S, r)}`.slice(0, 80)); });
