@@ -54,11 +54,11 @@ Téléchargez les installateurs sur la page **Releases** du dépôt : https://gi
 
 ### Windows (10 / 11, 64 bits)
 
-1. Lancez `MERCI-TV-Gestion-Setup-1.1.1.exe`.
+1. Lancez `MERCI-TV-Gestion-Setup-1.1.2.exe`.
 2. Si Windows affiche « Windows a protégé votre ordinateur », cliquez sur **Informations complémentaires → Exécuter quand même** (le logiciel n’est pas encore signé avec un certificat commercial).
 3. Suivez l’assistant. Un raccourci est créé sur le bureau et dans le menu Démarrer.
 
-Version sans installation : `MERCI-TV-Gestion-Portable-1.1.1.exe` (pratique sur clé USB).
+Version sans installation : `MERCI-TV-Gestion-Portable-1.1.2.exe` (pratique sur clé USB).
 
 ### macOS (12 Monterey et plus)
 
