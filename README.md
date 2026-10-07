@@ -50,6 +50,8 @@ Le texte Louis Segond 1910 est dans le domaine public.
 
 ## Installation
 
+Téléchargez les installateurs sur la page **Releases** du dépôt : https://github.com/visiondaigle-willy/merci-tv-gestion/releases/latest
+
 ### Windows (10 / 11, 64 bits)
 
 1. Lancez `MERCI-TV-Gestion-Setup-1.1.0.exe`.

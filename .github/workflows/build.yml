@@ -4,6 +4,11 @@ on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publier une Release GitHub avec les installateurs'
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -39,11 +44,37 @@ jobs:
             dist/*.dmg
             dist/*.zip
           if-no-files-found: error
-      - name: Publier la version
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.release)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
         with:
-          files: |
-            dist/*.exe
-            dist/*.dmg
-            dist/*.zip
+          path: artifacts
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.v.outputs.version }}
+          name: MERCI TV Gestion ${{ steps.v.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          body: |
+            ## Installer MERCI TV Gestion ${{ steps.v.outputs.version }}
+
+            **Windows 10 / 11**
+            - `MERCI-TV-Gestion-Setup-${{ steps.v.outputs.version }}.exe` — installateur (recommandé)
+            - `MERCI-TV-Gestion-Portable-${{ steps.v.outputs.version }}.exe` — version sans installation (clé USB)
+            - Si Windows affiche « Windows a protégé votre ordinateur » : *Informations complémentaires → Exécuter quand même*.
+
+            **macOS 11 et plus**
+            - Mac Apple Silicon (M1, M2, M3, M4) : `MERCI-TV-Gestion-${{ steps.v.outputs.version }}-mac-arm64.dmg`
+            - Mac Intel : `MERCI-TV-Gestion-${{ steps.v.outputs.version }}-mac-x64.dmg`
+            - Glissez l’application dans *Applications*, puis au premier lancement : *clic droit → Ouvrir → Ouvrir*.
+            - Si macOS indique que l’application est « endommagée » : `xattr -cr "/Applications/MERCI TV Gestion.app"` dans le Terminal.
+
+            Au premier démarrage, l’assistant crée le compte administrateur. Voir le README pour le guide complet.
+          files: artifacts/*
