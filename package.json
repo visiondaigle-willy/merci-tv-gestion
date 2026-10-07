@@ -1,0 +1,100 @@
+{
+  "name": "merci-tv-gestion",
+  "productName": "MERCI TV Gestion",
+  "version": "1.0.0",
+  "description": "Logiciel de gestion d'Église et du ministère média MERCI TV",
+  "main": "src/main/main.js",
+  "author": {
+    "name": "MERCI TV — Ministère de communication audiovisuelle"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node test/store.test.js",
+    "dist": "electron-builder --publish never",
+    "dist:win": "electron-builder --win --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:linux": "electron-builder --linux --publish never",
+    "test:e2e": "node test/e2e.js"
+  },
+  "build": {
+    "appId": "ci.mercitv.gestion",
+    "productName": "MERCI TV Gestion",
+    "copyright": "© MERCI TV — Abidjan, Côte d'Ivoire",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.png",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "identity": "-",
+      "artifactName": "MERCI-TV-Gestion-${version}-mac-${arch}.${ext}"
+    },
+    "dmg": {
+      "title": "MERCI TV Gestion"
+    },
+    "win": {
+      "icon": "build/icon.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MERCI TV Gestion",
+      "artifactName": "MERCI-TV-Gestion-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "MERCI-TV-Gestion-Portable-${version}.${ext}"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "target": [
+        "AppImage"
+      ],
+      "category": "Office"
+    },
+    "publish": null
+  },
+  "devDependencies": {
+    "electron": "^44.6.0",
+    "electron-builder": "^26.15.3"
+  }
+}
