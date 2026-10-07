@@ -211,6 +211,34 @@ const os = require('os');
   if (data.members.length !== 2 || data.members[0].number !== 'M-0001') throw new Error('membres');
   if (data.bibleBookmarks.length !== 1 || data.bibleBookmarks[0].ref !== 'Jean 3:16') throw new Error('marque-page');
   if (!fs.readdirSync(path.join(dataDir, 'sauvegardes')).length) throw new Error('aucune sauvegarde automatique');
+  // Réinitialisation de l'accès (mot de passe oublié)
+  await app.evaluate(({ shell }) => { shell.showItemInFolder = () => {}; });
+  await win.click('#btn-out'); await win.waitForSelector('#forgot');
+  await win.click('#forgot'); await win.click('#gen'); await win.waitForSelector('#code');
+  const codeFile = path.join(dataDir, 'CODE-REINITIALISATION.txt');
+  const code = fs.readFileSync(codeFile, 'utf8').match(/Code : ([0-9A-F-]+)/)[1];
+  await win.fill('#code', '0000-0000-0000'); await win.click('#cf button');
+  await win.waitForFunction(() => /incorrect/.test(document.getElementById('err').textContent));
+  await win.fill('#code', code.toLowerCase()); await win.click('#cf button');
+  await win.waitForSelector('#rf #ru');
+  if (fs.existsSync(codeFile)) throw new Error('le fichier de code doit être supprimé après usage');
+  await shot('22-reinitialisation');
+  await win.selectOption('#ru', { index: 0 });
+  await win.fill('#p1', 'nouveau-mdp-1'); await win.fill('#p2', 'nouveau-mdp-1'); await win.click('#rf button.gold');
+  await win.waitForSelector('.shell');
+  await win.click('#btn-out'); await win.waitForSelector('form#f');
+  await win.fill('[name=login]', 'admin'); await win.fill('[name=pw]', 'nouveau-mdp-1'); await win.click('button.gold'); await win.waitForSelector('.shell');
+  const kept = JSON.parse(fs.readFileSync(path.join(dataDir, 'donnees.json'), 'utf8'));
+  if (kept.members.length !== 2) throw new Error('les données doivent être conservées après réinitialisation du mot de passe');
+  // Remise à zéro complète
+  await win.click('#btn-out'); await win.click('#forgot'); await win.click('#gen'); await win.waitForSelector('#code');
+  await win.fill('#code', fs.readFileSync(codeFile, 'utf8').match(/Code : ([0-9A-F-]+)/)[1]); await win.click('#cf button');
+  await win.click('.reset-tabs [data-m=wipe]'); await win.fill('#wc', 'effacer'); await win.click('#rf button');
+  await win.waitForSelector('[name=pw2]');
+  if (!fs.readdirSync(path.join(dataDir, 'sauvegardes')).some(f => f.startsWith('avant-reinitialisation-'))) throw new Error('archive avant effacement manquante');
+  const wiped = JSON.parse(fs.readFileSync(path.join(dataDir, 'donnees.json'), 'utf8'));
+  if (wiped.members.length || wiped.users.length) throw new Error('données non effacées');
+
   await app.close();
   if (errors.length) { console.error('Erreurs console :\n' + errors.join('\n')); process.exit(1); }
   console.log('OK — parcours complet réussi. Captures :', shots);

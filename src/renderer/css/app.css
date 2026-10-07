@@ -289,3 +289,17 @@ table.grid input.cell.text[data-k=name] { min-width: 240px; font-weight: 600; }
 .verse-day .eyebrow { font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 8px; }
 .verse-day .vtext { font-family: var(--serif); font-style: italic; font-size: 16px; line-height: 1.6; margin: 0 0 12px; color: var(--navy); }
 .verse-day .vref { font-family: var(--serif); color: #8a6b22; }
+
+/* ---------- Réinitialisation de l'accès ---------- */
+.auth-card .link { display: block; width: 100%; margin-top: 14px; background: none; border: 0; color: var(--gold-soft); font-size: 12.5px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.auth-card .link:hover { color: #fff; }
+.auth-card.reset { width: 480px; }
+.auth-card .txt { text-align: left; line-height: 1.55; color: rgba(255,255,255,.85); font-size: 13.5px; }
+.auth-card .txt.warn { color: #ffcabd; }
+.auth-card .hint { text-align: left; margin-top: 0; }
+.auth-card .hint.path { word-break: break-all; }
+.auth-card select { width: 100%; padding: 11px 12px; border-radius: 4px; border: 1px solid rgba(255,255,255,.18); background: #1a2748; color: #fff; }
+.reset-tabs { display: flex; gap: 4px; margin: 6px 0 4px; }
+.reset-tabs button { flex: 1; padding: 8px 6px; border: 1px solid rgba(255,255,255,.18); background: transparent; color: rgba(255,255,255,.75); border-radius: 4px; cursor: pointer; font-size: 12px; }
+.reset-tabs button.on { background: var(--gold); border-color: var(--gold); color: var(--navy); font-weight: 600; }
+.btn.danger-solid { width: 100%; margin-top: 22px; justify-content: center; padding: 12px; background: #a8442f; border-color: #a8442f; color: #fff; }

@@ -108,8 +108,10 @@ const App = {
       <label>Mot de passe</label><input name="pw" type="password" required autocomplete="current-password">
       <div class="err" id="err">${U.esc(msg)}</div>
       <button class="btn gold">Se connecter</button>
+      <button type="button" class="link" id="forgot">Mot de passe ou identifiant oublié ? Réinitialiser l’accès</button>
       <div class="verse">« Que tout se fasse avec bienséance et avec ordre. »<b>1 CORINTHIENS 14:40</b></div>
     </form></div>`;
+    document.getElementById('forgot').onclick = () => this.resetAccess();
     document.getElementById('f').onsubmit = async ev => {
       ev.preventDefault();
       const f = Object.fromEntries(new FormData(ev.target));
@@ -121,6 +123,108 @@ const App = {
       this.log('Connexion', u.name);
       this.persist();
       this.start();
+    };
+  },
+
+  /* Réinitialisation de l'accès sans Internet : un code est écrit dans le dossier des données. */
+  resetAccess() {
+    const card = html => {
+      document.body.innerHTML = `<div class="auth"><div class="auth-card reset">${LOGO}<h1>Réinitialiser l’accès</h1>${html}
+        <button type="button" class="link" id="back">← Retour à la connexion</button></div></div>`;
+      document.getElementById('back').onclick = () => this.renderLogin();
+    };
+    const $ = id => document.getElementById(id);
+
+    // Étape 1 : générer le code
+    card(`<p class="txt">Pour protéger les données de l’Église, la réinitialisation se fait <b>sur cet ordinateur</b> :
+        le logiciel écrit un code à usage unique dans un fichier du dossier des données, puis l’ouvre dans le Finder (Mac) ou l’Explorateur (Windows).</p>
+      <button class="btn gold" id="gen">Générer le code</button><div class="err" id="err"></div>`);
+    $('gen').onclick = async () => {
+      try { await api.recoveryStart(); } catch (e) { return ($('err').textContent = e.message); }
+      step2();
+    };
+
+    // Étape 2 : saisir le code
+    const step2 = () => {
+      card(`<p class="txt">Le dossier des données vient de s’ouvrir. Ouvrez le fichier <b>CODE-REINITIALISATION.txt</b> et recopiez le code ci-dessous (valable 15 minutes).</p>
+        <p class="hint path">Dossier : ${U.esc(this.info.dataPath)}</p>
+        <form id="cf"><label>Code de réinitialisation</label><input id="code" placeholder="XXXX-XXXX-XXXX" autocomplete="off" autofocus style="text-transform:uppercase;letter-spacing:.12em">
+        <div class="err" id="err"></div><button class="btn gold">Valider le code</button></form>
+        <button type="button" class="link" id="again">Générer un nouveau code</button>`);
+      $('again').onclick = async () => { await api.recoveryStart(); $('err').textContent = 'Nouveau code généré.'; };
+      $('cf').onsubmit = async ev => {
+        ev.preventDefault();
+        const r = await api.recoveryVerify($('code').value);
+        if (!r.ok) return ($('err').textContent = r.reason);
+        this.log('Réinitialisation de l’accès', 'Code vérifié sur cet ordinateur');
+        step3();
+      };
+    };
+
+    // Étape 3 : choisir l'action
+    const step3 = () => {
+      const users = this.data.users;
+      card(`<p class="txt">Code vérifié. Que souhaitez-vous faire ?</p>
+        <div class="reset-tabs"><button class="on" data-m="pw">Nouveau mot de passe</button><button data-m="new">Nouveau compte admin</button><button data-m="wipe">Tout effacer</button></div>
+        <form id="rf"></form>`);
+      const forms = {
+        pw: `<label>Compte</label><select id="ru">${users.map(u => `<option value="${u.id}">${U.esc(u.name)} — identifiant : ${U.esc(u.login)}${u.active === false ? ' (désactivé)' : ''}</option>`).join('')}</select>
+          <label>Nouveau mot de passe (8 caractères min.)</label><input id="p1" type="password" autocomplete="new-password">
+          <label>Confirmer</label><input id="p2" type="password" autocomplete="new-password">
+          <div class="err" id="err"></div><button class="btn gold">Enregistrer et se connecter</button>
+          <p class="hint">Le compte est réactivé s’il était désactivé. Les données de l’Église sont conservées.</p>`,
+        new: `<label>Nom complet</label><input id="nn" value="${U.esc(this.data.settings.leader || '')}">
+          <label>Identifiant de connexion</label><input id="nl" value="admin2">
+          <label>Mot de passe (8 caractères min.)</label><input id="p1" type="password" autocomplete="new-password">
+          <label>Confirmer</label><input id="p2" type="password" autocomplete="new-password">
+          <div class="err" id="err"></div><button class="btn gold">Créer et se connecter</button>
+          <p class="hint">Un nouveau compte Administrateur est ajouté. Les données et les autres comptes sont conservés.</p>`,
+        wipe: `<p class="txt warn">Toutes les données (membres, finances, MERCI TV, comptes…) seront effacées et le logiciel repartira de zéro. Une copie de sécurité est d’abord enregistrée dans le dossier « sauvegardes ».</p>
+          <label>Tapez EFFACER pour confirmer</label><input id="wc" autocomplete="off">
+          <div class="err" id="err"></div><button class="btn danger-solid">Effacer et recommencer</button>`
+      };
+      let mode = 'pw';
+      const show = () => {
+        $('rf').innerHTML = forms[mode];
+        document.querySelectorAll('.reset-tabs button').forEach(b => b.classList.toggle('on', b.dataset.m === mode));
+      };
+      document.querySelectorAll('.reset-tabs button').forEach(b => (b.onclick = () => { mode = b.dataset.m; show(); }));
+      if (!users.length) mode = 'new';
+      show();
+      const pwOk = () => {
+        if ($('p1').value.length < 8) return ($('err').textContent = 'Le mot de passe doit contenir au moins 8 caractères.'), false;
+        if ($('p1').value !== $('p2').value) return ($('err').textContent = 'Les mots de passe ne correspondent pas.'), false;
+        return true;
+      };
+      $('rf').onsubmit = async ev => {
+        ev.preventDefault();
+        if (mode === 'pw') {
+          if (!pwOk()) return;
+          const u = users.find(x => x.id === $('ru').value);
+          Object.assign(u, await api.hashPassword($('p1').value), { active: true });
+          this.user = u;
+          this.log('Réinitialisation de l’accès', `Nouveau mot de passe pour ${u.name}`);
+        } else if (mode === 'new') {
+          const name = $('nn').value.trim(), login = $('nl').value.trim().toLowerCase();
+          if (!name || !login) return ($('err').textContent = 'Nom et identifiant obligatoires.');
+          if (users.some(x => x.login === login)) return ($('err').textContent = 'Cet identifiant est déjà utilisé.');
+          if (!pwOk()) return;
+          const u = { id: U.uid(), name, login, role: 'admin', active: true, ...(await api.hashPassword($('p1').value)), createdAt: U.now() };
+          users.push(u);
+          this.user = u;
+          this.log('Réinitialisation de l’accès', `Nouveau compte administrateur ${name} (${login})`);
+        } else {
+          if ($('wc').value.trim().toUpperCase() !== 'EFFACER') return ($('err').textContent = 'Tapez EFFACER pour confirmer.');
+          await api.archiveData(this.data, 'avant-reinitialisation');
+          this.data = SEED.initialData();
+          await this.persist();
+          return this.renderSetup();
+        }
+        this.user.lastLogin = U.now();
+        await this.persist();
+        this.start();
+        this.toast('Accès réinitialisé. Pensez à noter votre identifiant et votre mot de passe.');
+      };
     };
   },
 

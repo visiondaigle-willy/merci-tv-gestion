@@ -54,11 +54,11 @@ Téléchargez les installateurs sur la page **Releases** du dépôt : https://gi
 
 ### Windows (10 / 11, 64 bits)
 
-1. Lancez `MERCI-TV-Gestion-Setup-1.1.2.exe`.
+1. Lancez `MERCI-TV-Gestion-Setup-1.2.0.exe`.
 2. Si Windows affiche « Windows a protégé votre ordinateur », cliquez sur **Informations complémentaires → Exécuter quand même** (le logiciel n’est pas encore signé avec un certificat commercial).
 3. Suivez l’assistant. Un raccourci est créé sur le bureau et dans le menu Démarrer.
 
-Version sans installation : `MERCI-TV-Gestion-Portable-1.1.2.exe` (pratique sur clé USB).
+Version sans installation : `MERCI-TV-Gestion-Portable-1.2.0.exe` (pratique sur clé USB).
 
 ### macOS (12 Monterey et plus)
 
@@ -75,6 +75,19 @@ Version sans installation : `MERCI-TV-Gestion-Portable-1.1.2.exe` (pratique sur 
 ### Premier démarrage
 
 L’assistant demande le nom de l’Église et crée le **compte administrateur**. Ensuite, dans **Paramètres → Utilisateurs**, créez un compte pour chaque personne (secrétaire, trésorier, équipe média…) avec le rôle approprié.
+
+### Mot de passe ou identifiant oublié
+
+Sur l’écran de connexion, cliquez sur **« Mot de passe ou identifiant oublié ? Réinitialiser l’accès »** :
+
+1. **Générer le code** : le logiciel écrit un code à usage unique dans le fichier `CODE-REINITIALISATION.txt` du dossier des données et ouvre ce dossier (Finder sur Mac, Explorateur sur Windows).
+2. Recopiez le code (valable 15 minutes, 5 essais au maximum). Le fichier est supprimé automatiquement après usage.
+3. Choisissez :
+   - **Nouveau mot de passe** pour un compte existant (la liste affiche aussi les identifiants) ;
+   - **Nouveau compte admin**, en conservant les autres comptes ;
+   - **Tout effacer** pour repartir de zéro. Une copie `avant-reinitialisation-….json` est d’abord enregistrée dans `sauvegardes/` et peut être restaurée ensuite.
+
+Les données de l’Église sont conservées dans les deux premiers cas. Cette procédure n’est possible que depuis la session de l’ordinateur où se trouvent les données, et chaque réinitialisation est inscrite au journal des opérations.
 
 ### Où sont les données ?
 

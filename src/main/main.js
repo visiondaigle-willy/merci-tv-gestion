@@ -8,6 +8,7 @@ const { hashPassword, verifyPassword } = require('./auth');
 
 let win;
 let projector = null;
+let recovery = null; // { code, expires, attempts }
 let store;
 const isMac = process.platform === 'darwin';
 
@@ -123,6 +124,48 @@ function registerIpc() {
 
   ipcMain.handle('auth:hash', (_e, pw) => hashPassword(pw));
   ipcMain.handle('auth:verify', (_e, pw, salt, hash, iter) => verifyPassword(pw, salt, hash, iter));
+
+  // ---- Réinitialisation de l'accès (mot de passe oublié) ----
+  // Le code est écrit dans un fichier du dossier des données : seule une personne ayant
+  // accès à la session de l'ordinateur peut le lire (les données y sont déjà stockées).
+  ipcMain.handle('recovery:start', () => {
+    const raw = crypto.randomBytes(6).toString('hex').toUpperCase(); // 12 caractères
+    const code = `${raw.slice(0, 4)}-${raw.slice(4, 8)}-${raw.slice(8)}`;
+    recovery = { code, expires: Date.now() + 15 * 60 * 1000, attempts: 0 };
+    const file = path.join(dataDir(), 'CODE-REINITIALISATION.txt');
+    fs.writeFileSync(file, [
+      'MERCI TV Gestion — code de réinitialisation de l’accès',
+      '',
+      `Code : ${code}`,
+      '',
+      `Généré le ${new Date().toLocaleString('fr-FR')} — valable 15 minutes, une seule fois.`,
+      'Saisissez ce code dans le logiciel. Ce fichier est supprimé automatiquement après usage.',
+      'Si vous n’êtes pas à l’origine de cette demande, supprimez simplement ce fichier.'
+    ].join('\n'), 'utf8');
+    shell.showItemInFolder(file);
+    return { file };
+  });
+  ipcMain.handle('recovery:verify', (_e, input) => {
+    const file = path.join(dataDir(), 'CODE-REINITIALISATION.txt');
+    if (!recovery || Date.now() > recovery.expires) { recovery = null; return { ok: false, reason: 'Le code a expiré. Générez-en un nouveau.' }; }
+    const clean = String(input || '').toUpperCase().replace(/[^0-9A-F]/g, '');
+    const ok = clean.length === 12 && crypto.timingSafeEqual(Buffer.from(clean), Buffer.from(recovery.code.replace(/-/g, '')));
+    if (!ok) {
+      recovery.attempts++;
+      if (recovery.attempts >= 5) { recovery = null; try { fs.unlinkSync(file); } catch (_) {} return { ok: false, reason: 'Trop d’essais. Générez un nouveau code.' }; }
+      return { ok: false, reason: `Code incorrect (${5 - recovery.attempts} essai(s) restant(s)).` };
+    }
+    recovery = null;
+    try { fs.unlinkSync(file); } catch (_) {}
+    return { ok: true };
+  });
+  // Copie de sécurité nommée avant une remise à zéro complète.
+  ipcMain.handle('data:archive', (_e, data, label) => {
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+    const file = path.join(dataDir(), 'sauvegardes', `${label || 'archive'}-${stamp}.json`);
+    fs.writeFileSync(file, JSON.stringify(data), 'utf8');
+    return file;
+  });
 
   ipcMain.handle('app:info', () => ({
     version: app.getVersion(),
